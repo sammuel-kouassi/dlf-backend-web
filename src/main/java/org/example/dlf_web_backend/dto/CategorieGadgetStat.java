@@ -1,4 +1,6 @@
 package org.example.dlf_web_backend.dto;
 
-public class CategorieGadgetStat {
+public interface CategorieGadgetStat {
+    String getCategorie();
+    Long getTotal();
 }

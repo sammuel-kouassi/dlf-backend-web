@@ -1,6 +1,6 @@
 package org.example.dlf_web_backend.dto;
 
-public interface MonthlyGadgetStat {
+public interface MonthlyParticipantStat {
     String getMonth();
     Long getCount();
 }
