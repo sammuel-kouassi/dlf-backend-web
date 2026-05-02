@@ -47,6 +47,12 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                         // Actuator health public
                         .requestMatchers("/actuator/health").permitAll()
+                        // Fichiers images servis publiquement (accessibles depuis le mobile et le web)
+                        .requestMatchers("/api/images/files/**").permitAll()
+                        // Upload : accessible depuis le mobile
+                        .requestMatchers("/api/images/upload").permitAll()
+                        // Actuator health public
+                        .requestMatchers("/actuator/health").permitAll()
                         // Tout le reste nécessite un token valide
                         .anyRequest().authenticated()
                 )

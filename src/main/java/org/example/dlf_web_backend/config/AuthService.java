@@ -29,14 +29,9 @@ public class AuthService {
         this.jwtUtil = jwtUtil;
     }
 
-    // ───────────────────────────────────
-    // Register (premier compte admin web)
-    // ───────────────────────────────────
-
     public AuthResponse register(RegisterRequest req) {
         if (repo.existsByEmail(req.email)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    "Un compte avec cet email existe déjà");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Un compte avec cet email existe déjà");
         }
 
         Utilisateur u = new Utilisateur();
@@ -47,35 +42,26 @@ public class AuthService {
         repo.save(u);
 
         String token = jwtUtil.generateToken(u.getEmail(), u.getRole());
-        return new AuthResponse(token, u.getEmail(), u.getNom(), u.getRole());
+        return new AuthResponse(token, u.getId(), u.getEmail(), u.getNom(), u.getRole());
     }
-
-    // ─────────────────────────────────────────────
-    // Login
-    // ─────────────────────────────────────────────
 
     public AuthResponse login(LoginRequest req) {
         Utilisateur u = repo.findByEmail(req.email)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.UNAUTHORIZED, "Email ou mot de passe incorrect"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Email ou mot de passe incorrect"));
 
         if (!encoder.matches(req.motDePasse, u.getMotDePasse())) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
-                    "Email ou mot de passe incorrect");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Email ou mot de passe incorrect");
         }
 
         if (!u.getRole().equals("administrateur") && !u.getRole().equals("superviseur")) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
-                    "Ce compte n'a pas accès à la plateforme web");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Ce compte n'a pas accès à la plateforme web");
         }
 
         String token = jwtUtil.generateToken(u.getEmail(), u.getRole());
-        return new AuthResponse(token, u.getEmail(), u.getNom(), u.getRole());
+        return new AuthResponse(token, u.getId(), u.getEmail(), u.getNom(), u.getRole());
     }
 
-    // ─────────────────────────────────────────────
-    // Gestion des comptes mobiles (par admin web)
-    // ─────────────────────────────────────────────
+    // Gestion des comptes mobiles
 
     public UserResponse createMobileUser(CreateUserRequest req) {
         if (repo.existsByEmail(req.email)) {

@@ -1,5 +1,6 @@
 package org.example.dlf_web_backend.controllers;
 
+import org.example.dlf_web_backend.services.NotificationService;
 import org.example.dlf_web_backend.entities.Rdv;
 import org.example.dlf_web_backend.repositories.RdvRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,12 @@ public class RdvController {
     @Autowired
     private RdvRepository rdvRepository;
 
+    private final NotificationService notificationService;
+
+    public RdvController(NotificationService notificationService) {
+        this.notificationService = notificationService;
+    }
+
     @GetMapping
     public List<Rdv> getAllRdvs() {
         return rdvRepository.findAll();
@@ -31,9 +38,29 @@ public class RdvController {
         return rdvRepository.findBySeanceId(seanceId);
     }
 
+    /** Crée un RDV ET notifie le mobile */
     @PostMapping
     public Rdv createRdv(@RequestBody Rdv rdv) {
-        return rdvRepository.save(rdv);
+        Rdv saved = rdvRepository.save(rdv);
+
+        try {
+
+            String dateStr = saved.getDateRdv() != null
+                    ? saved.getDateRdv().toLocalDateTime().toLocalDate().toString()
+                    : "";
+            String heure = saved.getHeure() != null ? " à " + saved.getHeure() : "";
+
+            notificationService.notifyMobile(
+                    "Nouveau RDV — " + saved.getTitre(),
+                    "Contact : " + saved.getContact() + " · " + dateStr + heure,
+                    "rdv",
+                    saved.getId()
+            );
+        } catch (Exception e) {
+            System.out.println("⚠️ Notif RDV échouée : " + e.getMessage());
+        }
+
+        return saved;
     }
 
     @PutMapping("/{id}")

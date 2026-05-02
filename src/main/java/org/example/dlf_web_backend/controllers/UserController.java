@@ -11,15 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Endpoints protégés (JWT requis) pour la gestion des utilisateurs.
- * Accessible uniquement aux administrateurs.
- * GET    /api/users              → Tous les utilisateurs
- * GET    /api/users ? Role=xxx     → Filtrer par rôle
- * POST   /api/users              → Créer un compte (mobile ou web)
- * PUT    /api/users/{id}         → Modifier nom/rôle/mot de passe
- * DELETE /api/users/{id}         → Supprimer un compte
- */
 @RestController
 @RequestMapping("/api/users")
 @PreAuthorize("hasRole('ADMINISTRATEUR')")
